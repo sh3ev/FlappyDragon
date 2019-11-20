@@ -37,8 +37,8 @@ cvs.addEventListener("click", function(evt) {
             break;
         case state.over:
             let rect = cvs.getBoundingClientRect();
-            let clickX  = evt.clientX - react.left;
-            let clickY  = evt.clientY - react.top;
+            let clickX  = evt.clientX - rect.left;
+            let clickY  = evt.clientY - rect.top;
 
             // CHECK IF CLICK ON THE BUTTON
             if(clickX >= startBtn.x && clickX <= startBtn.x + startBtn.w && clickY >=
@@ -164,6 +164,9 @@ const dragon = {
                 this.rotation = -25 * DEGREE;
             }
         }
+    },
+    speedReset : function(){
+        this.speed = 0;
     }
 }
 
@@ -278,6 +281,10 @@ const pipes = {
                 localStorage.setItem("best", score.best);
             }
         }
+    },
+    
+    reset : function(){
+        this.position = [];
     }
 }
 
@@ -291,7 +298,7 @@ const score = {
         ctx.strokeStyle = "#000";
 
         if(state.current == state.game){
-            ctx.lineWidth == 2;
+            ctx.lineWidth = 2;
             ctx.font = "35px Teko";
             ctx.fillText(this.value, cvs.width/2, 50);
             ctx.strokeText(this.value, cvs.width/2, 50);
@@ -301,9 +308,13 @@ const score = {
             ctx.fillText(this.value, 225, 186);
             ctx.strokeText(this.value, 225, 186);
             // BEST SCORE
-            ctx.fillText(this.best , 225, 228);
+            ctx.fillText(this.best, 225, 228);
             ctx.strokeText(this.best, 225, 228);
         }
+    },
+
+    reset : function(){
+        this.value = 0;
     }
 }
 
