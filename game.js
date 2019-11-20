@@ -9,8 +9,30 @@ let frames = 0;
 const sprite = new Image();
 sprite.src = 'img/sprite.png';
 
-//  BACKGROUND
+// GAME STATE
+const state = {
+    current : 0,
+    getReady : 0,
+    game : 1,
+    over : 2
+}
 
+// CONTROL THE GAME
+cvs.addEventListener("click", function(evt) {
+    switch(state.current) {
+        case state.getReady:
+            state.current = state.game;
+            break;
+        case state.game:
+            dragon.flap();
+            break;
+        case state.over:
+            state.current = state.getReady;
+            break;
+    }
+});
+
+//  BACKGROUND
 const bg = {
     sX: 0,
     sY: 0,
@@ -65,7 +87,11 @@ const dragon = {
         let dragon = this.animation[this.frame];
         ctx.drawImage(sprite, dragon.sX, dragon.sY, this.w, this.h, this.x-this.w/2, this.y-this.w/2,
         this.w, this.h);
-    }
+    },
+
+    flap: function(){
+
+    },
 }
 
 // GET READY MESSAGE
@@ -78,8 +104,10 @@ const getReady = {
     y : 80,
 
     draw: function(){
-        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y,
-        this.w, this.h);
+        if(state.current == state.getReady){
+            ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y,
+            this.w, this.h);
+        }
     }
 
 }
@@ -94,8 +122,11 @@ const gameOver = {
     y : 90,
 
     draw: function(){
-        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y,
-        this.w, this.h);
+        if(state.current == state.over){
+            ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y,
+            this.w, this.h);
+        }
+
     }
 
 }
