@@ -83,6 +83,10 @@ const dragon = {
 
     frame: 0,
 
+    gravity : 0.25,
+    jump : 4.6,
+    speed : 0,
+
     draw : function() {
         let dragon = this.animation[this.frame];
         ctx.drawImage(sprite, dragon.sX, dragon.sY, this.w, this.h, this.x-this.w/2, this.y-this.w/2,
@@ -92,6 +96,22 @@ const dragon = {
     flap: function(){
 
     },
+
+    update: function(){
+        // IF THE GAME IS GET READY STATE, THE BIRD MUST FLAP SLOWLY
+        this.period = state.current == state.getReady ? 10 : 5;
+        // WE INCREMENT THE FRAME BY 1, EACH PERIOD 
+        this.frame += frames%this.period == 0 ? 1 : 0;
+        // FRAME GOES FROM 0 TO 4. THEN AGAIN TO 0
+        this.frame = this.frame%this.animation.length;
+
+        if(state.current == state.getReady){
+            
+        }else{
+            this.speed += this.gravity;
+            this.y += this.speed;
+        }
+    }
 }
 
 // GET READY MESSAGE
@@ -146,7 +166,7 @@ function draw(){
 // UPDATE
 
 function update() {
-
+    dragon.update();
 }
 
 // LOOP
