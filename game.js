@@ -18,6 +18,14 @@ const state = {
     over : 2
 }
 
+//START BUTTON COORD
+const startBtn = {
+    x : 120,
+    y : 263,
+    w : 83,
+    h : 29
+}
+
 // CONTROL THE GAME
 cvs.addEventListener("click", function(evt) {
     switch(state.current) {
@@ -28,7 +36,18 @@ cvs.addEventListener("click", function(evt) {
             dragon.flap();
             break;
         case state.over:
-            state.current = state.getReady;
+            let rect = cvs.getBoundingClientRect();
+            let clickX  = evt.clientX - react.left;
+            let clickY  = evt.clientY - react.top;
+
+            // CHECK IF CLICK ON THE BUTTON
+            if(clickX >= startBtn.x && clickX <= startBtn.x + startBtn.w && clickY >=
+            startBtn.y && clickY <= startBtn.y + startBtn.h){
+                pipes.reset();
+                dragon.speedReset();
+                score.reset();
+                state.current = state.getReady;
+            }
             break;
     }
 });
@@ -249,11 +268,41 @@ const pipes = {
 
             //MOVE THE PIPES TO THE LEFT
             p.x -= this.dx;
-            
+
             // if the pipes fo beyond canvas, delete them from array
             if(p.x + this.w <= 0){
                 this.position.shift();
+                score.value += 1;
+
+                score.best = Math.max(score.value, score.best);
+                localStorage.setItem("best", score.best);
             }
+        }
+    }
+}
+
+// SCORE
+const score = {
+    best: parseInt(localStorage.getItem("best")) || 0,
+    value: 0,
+
+    draw : function(){
+        ctx.fillStyle = "#FFF";
+        ctx.strokeStyle = "#000";
+
+        if(state.current == state.game){
+            ctx.lineWidth == 2;
+            ctx.font = "35px Teko";
+            ctx.fillText(this.value, cvs.width/2, 50);
+            ctx.strokeText(this.value, cvs.width/2, 50);
+        }else if(state.current == state.over) {
+            // SCORE VALUE
+            ctx.font = "25px Teko";
+            ctx.fillText(this.value, 225, 186);
+            ctx.strokeText(this.value, 225, 186);
+            // BEST SCORE
+            ctx.fillText(this.best , 225, 228);
+            ctx.strokeText(this.best, 225, 228);
         }
     }
 }
@@ -269,6 +318,7 @@ function draw(){
     dragon.draw();
     getReady.draw();
     gameOver.draw();
+    score.draw();
 }
 
 // UPDATE
