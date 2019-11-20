@@ -90,6 +90,8 @@ const dragon = {
     w: 52,
     h: 31,
 
+    radius : 12,
+
     frame: 0,
 
     gravity : 0.25,
@@ -137,7 +139,7 @@ const dragon = {
 
             // IF THE SPEED IS GREATER THAN JUMP MEANS THE BIRD IS FALLING DOWN
             if(this.speed >= this.jump) {
-                this.rotation = 90 * DEGREE;
+                this.rotation = 45 * DEGREE;
                 this.frame = 1;
             }else{
                 this.rotation = -25 * DEGREE;
@@ -183,12 +185,86 @@ const gameOver = {
 
 }
 
+// PIPES
+const pipes = {
+    position: [],
+
+    top: {
+        sX : 553,
+        sY : 0
+    },
+    bottom: {
+        sX : 502,
+        sY : 0
+    },
+
+    w : 53,
+    h : 400,
+    gap : 100,
+    maxYPos : -150,
+    dx : 2,
+
+    draw : function() {
+        for(let i =0; i < this.position.length; i++){
+            let p = this.position[i];
+
+            let topYPos = p.y;
+            let bottomYPos = p.y + this.h + this.gap;
+
+            // top pipe
+            ctx.drawImage(sprite, this.top.sX, this.top.sY, this.w, this.h, p.x, topYPos,
+            this.w, this.h);
+
+            // bottom pipe
+            ctx.drawImage(sprite, this.bottom.sX, this.bottom.sY, this.w, this.h, p.x, bottomYPos,
+            this.w, this.h);
+        }
+    },
+
+    update: function(){
+        if(state.current !== state.game) return;
+
+        if(frames%100 == 0){
+            this.position.push({
+                x : cvs.width,
+                y: this.maxYPos * ( Math.random() + 1 )
+            });
+        }
+        for(let i = 0; i < this.position.length; i++){
+            let p = this.position[i];
+
+            let bottomPipesYPos = p.y + this.h + this.gap;
+
+            // COLLISION DETECTION
+            // TOP PIPE
+            if(dragon.x + dragon.radius > p.x && dragon.x - dragon.radius < p.x + this.w && 
+            dragon.y + dragon.radius > p.y && dragon.y - dragon. radius < p.y + this.h){
+                state.current = state.over;
+            }
+            // BOTTOM PIPE
+            if(dragon.x + dragon.radius > p.x && dragon.x - dragon.radius < p.x + this.w && 
+            dragon.y + dragon.radius > bottomPipesYPos && dragon.y - dragon. radius < bottomPipesYPos + this.h){
+                state.current = state.over;
+            }
+
+            //MOVE THE PIPES TO THE LEFT
+            p.x -= this.dx;
+            
+            // if the pipes fo beyond canvas, delete them from array
+            if(p.x + this.w <= 0){
+                this.position.shift();
+            }
+        }
+    }
+}
+
 // DRAW
 function draw(){
     ctx.fillStyle = "#70cbce";
     ctx.fillRect(0, 0, cvs.width, cvs.height);
 
     bg.draw();
+    pipes.draw();
     fg.draw();
     dragon.draw();
     getReady.draw();
@@ -200,6 +276,7 @@ function draw(){
 function update() {
     dragon.update();
     fg.update();
+    pipes.update();
 }
 
 // LOOP
