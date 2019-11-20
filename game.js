@@ -4,6 +4,7 @@ const ctx = cvs.getContext("2d");
 
 // GAME VARS AND CONSTS
 let frames = 0;
+const DEGREE = Math.PI/180;
 
 // LOAD SPRITE IMAGES
 const sprite = new Image();
@@ -86,11 +87,18 @@ const dragon = {
     gravity : 0.25,
     jump : 4.6,
     speed : 0,
+    rotation: 0,
 
     draw : function() {
         let dragon = this.animation[this.frame];
-        ctx.drawImage(sprite, dragon.sX, dragon.sY, this.w, this.h, this.x-this.w/2, this.y-this.w/2,
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.drawImage(sprite, dragon.sX, dragon.sY, this.w, this.h, -this.w/2, -this.w/2,
         this.w, this.h);
+
+        ctx.restore();
     },
 
     flap: function(){
@@ -98,7 +106,7 @@ const dragon = {
     },
 
     update: function(){
-        // IF THE GAME IS GET READY STATE, THE BIRD MUST FLAP SLOWLY
+        // IF THE GAME IS GET READY STATE, THE DRAGON MUST FLAP SLOWLY
         this.period = state.current == state.getReady ? 10 : 5;
         // WE INCREMENT THE FRAME BY 1, EACH PERIOD 
         this.frame += frames%this.period == 0 ? 1 : 0;
@@ -106,16 +114,25 @@ const dragon = {
         this.frame = this.frame%this.animation.length;
 
         if(state.current == state.getReady){
-            this.y = 150;
+            this.y = 150;  // RESET TO START POSITION
+            this.rotation = 0 * DEGREE;
         }else{
             this.speed += this.gravity;
             this.y += this.speed;
 
             if(this.y + this.h/2 >= cvs.height - fg.h){
-                this.y = cvs.height - fg.h - this.h/7;
+                this.y = cvs.height - fg.h - this.h/2;
                 if(state.current == state.game){
                     state.current = state.over; 
                 }
+            }
+
+            // IF THE SPEED IS GREATER THAN JUMP MEANS THE BIRD IS FALLING DOWN
+            if(this.speed >= this.jump) {
+                this.rotation = 90 * DEGREE;
+                this.frame = 1;
+            }else{
+                this.rotation = -25 * DEGREE;
             }
         }
     }
