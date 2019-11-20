@@ -10,6 +10,29 @@ const DEGREE = Math.PI/180;
 const sprite = new Image();
 sprite.src = 'img/sprite.png';
 
+// LOAD AUDIO
+const FLAP = new Audio();
+FLAP.src = "audio/flap_sound.wav";
+
+const HIT = new Audio();
+HIT.src = "audio/hit_sound.wav";
+
+const POINT = new Audio();
+POINT.src = "audio/point_sound.wav";
+
+const DIE = new Audio();
+DIE.src = "audio/die_sound.wav";
+
+const SWOOSHING = new Audio();
+SWOOSHING.src = "audio/swooshing_sound.wav";
+
+const MUSIC = new Audio();
+MUSIC.src = "audio/music.wav";
+
+
+MUSIC.loop = true;
+MUSIC.volume = 0.5;
+MUSIC.play();
 // GAME STATE
 const state = {
     current : 0,
@@ -31,9 +54,11 @@ cvs.addEventListener("click", function(evt) {
     switch(state.current) {
         case state.getReady:
             state.current = state.game;
+            SWOOSHING.play();
             break;
         case state.game:
             dragon.flap();
+            FLAP.play();
             break;
         case state.over:
             let rect = cvs.getBoundingClientRect();
@@ -153,6 +178,7 @@ const dragon = {
                 this.y = cvs.height - fg.h - this.h/2;
                 if(state.current == state.game){
                     state.current = state.over; 
+                    DIE.play();
                 }
             }
 
@@ -262,11 +288,13 @@ const pipes = {
             if(dragon.x + dragon.radius > p.x && dragon.x - dragon.radius < p.x + this.w && 
             dragon.y + dragon.radius > p.y && dragon.y - dragon. radius < p.y + this.h){
                 state.current = state.over;
+                HIT.play();
             }
             // BOTTOM PIPE
             if(dragon.x + dragon.radius > p.x && dragon.x - dragon.radius < p.x + this.w && 
             dragon.y + dragon.radius > bottomPipesYPos && dragon.y - dragon. radius < bottomPipesYPos + this.h){
                 state.current = state.over;
+                HIT.play();
             }
 
             //MOVE THE PIPES TO THE LEFT
@@ -276,7 +304,8 @@ const pipes = {
             if(p.x + this.w <= 0){
                 this.position.shift();
                 score.value += 1;
-
+                POINT.play();
+                setRandomColor();
                 score.best = Math.max(score.value, score.best);
                 localStorage.setItem("best", score.best);
             }
@@ -320,7 +349,7 @@ const score = {
 
 // DRAW
 function draw(){
-    ctx.fillStyle = "#70cbce";
+    ctx.fillStyle = "#190641";
     ctx.fillRect(0, 0, cvs.width, cvs.height);
 
     bg.draw();
@@ -350,4 +379,18 @@ function loop () {
     requestAnimationFrame(loop);
 }
 
+// SET RANDOM BACKGROUND COLOR
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+  
+  
+function setRandomColor() {
+    $("body").css("background-color", getRandomColor());
+  }
 loop();
