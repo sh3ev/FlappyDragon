@@ -94,7 +94,7 @@ const dragon = {
     },
 
     flap: function(){
-
+        this.speed = - this.jump;
     },
 
     update: function(){
