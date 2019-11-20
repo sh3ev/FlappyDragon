@@ -106,10 +106,17 @@ const dragon = {
         this.frame = this.frame%this.animation.length;
 
         if(state.current == state.getReady){
-            
+            this.y = 150;
         }else{
             this.speed += this.gravity;
             this.y += this.speed;
+
+            if(this.y + this.h/2 >= cvs.height - fg.h){
+                this.y = cvs.height - fg.h - this.h/7;
+                if(state.current == state.game){
+                    state.current = state.over; 
+                }
+            }
         }
     }
 }
